@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Broker52 | Revisión de créditos de vivienda</title>
+
+  <meta
+    name="description"
+    content="Broker52 analiza créditos de vivienda y evalúa alternativas para mejorar sus condiciones, reducir intereses y optimizar el plazo."
+  >
+
+  <style>
+    :root {
+      --bg: #f7f5f1;
+      --card: #ffffff;
+      --text: #202020;
+      --muted: #666666;
+      --dark: #1f2529;
+      --gold: #b89055;
+      --border: #e8e2da;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .nav {
+      max-width: 1100px;
+      margin: auto;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      font-size: 25px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand span {
+      color: var(--gold);
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      margin-left: 22px;
+      font-size: 14px;
+    }
+
+    .hero {
+      max-width: 1100px;
+      margin: auto;
+      padding: 105px 24px 95px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: clamp(42px, 6vw, 70px);
+      line-height: 1.02;
+      letter-spacing: -2.5px;
+      margin-bottom: 25px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 19px;
+      max-width: 680px;
+      margin-bottom: 32px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 15px 25px;
+      background: var(--dark);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
+    .hero-card {
+      background: var(--dark);
+      color: white;
+      border-radius: 22px;
+      padding: 42px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.12);
+    }
+
+    .hero-card h2 {
+      font-size: 27px;
+      margin-bottom: 18px;
+    }
+
+    .hero-card p {
+      color: #d9d9d9;
+      font-size: 16px;
+      margin-bottom: 0;
+    }
+
+    section {
+      padding: 85px 24px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .section-title {
+      max-width: 720px;
+      margin-bottom: 45px;
+    }
+
+    .section-title h2 {
+      font-size: 38px;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .section-title p {
+      color: var(--muted);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 30px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .number {
+      color: var(--gold);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      font-size: 21px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .process {
+      background: #ffffff;
+    }
+
+    .contact {
+      background: var(--dark);
+      color: #fff;
+    }
+
+    .contact .section-title p {
+      color: #d0d0d0;
+    }
+
+    .contact-box {
+      margin-top: 25px;
+      padding: 28px;
+      border: 1px solid #454b50;
+      border-radius: 14px;
+      max-width: 580px;
+    }
+
+    .contact-box p {
+      color: #dedede;
+      margin-bottom: 8px;
+    }
+
+    .contact-box strong {
+      color: white;
+    }
+
+    .legal {
+      font-size: 13px;
+      color: #aaa;
+      margin-top: 35px;
+      max-width: 850px;
+    }
+
+    footer {
+      background: #171b1e;
+      color: #a8a8a8;
+      text-align: center;
+      padding: 28px 20px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 800px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 70px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        display: none;
+      }
+
+      h1 {
+        letter-spacing: -1.5px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand">Broker<span>52</span></div>
+
+    <nav>
+      <a href="#servicios">Qué hacemos</a>
+      <a href="#proceso">Cómo funciona</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+  </div>
+</header>
+
+
+<main>
+
+  <section class="hero">
+
+    <div>
+      <div class="eyebrow">Créditos de vivienda</div>
+
+      <h1>
+        Una mejor forma de pagar tu casa.
+      </h1>
+
+      <p>
+        Analizamos tu crédito de vivienda y evaluamos alternativas
+        que podrían ayudarte a obtener mejores condiciones,
+        reducir intereses y optimizar el tiempo de pago.
+      </p>
+
+      <a class="button" href="#contacto">
+        Conoce Broker52
+      </a>
+    </div>
+
+    <div class="hero-card">
+      <h2>Tu crédito merece ser revisado.</h2>
+
+      <p>
+        Las condiciones de un crédito de vivienda pueden cambiar
+        con el tiempo. Broker52 estudia cada caso individualmente
+        para identificar oportunidades de optimización.
+      </p>
+    </div>
+
+  </section>
+
+
+  <section id="servicios">
+
+    <div class="container">
+
+      <div class="section-title">
+        <h2>¿Qué hacemos?</h2>
+
+        <p>
+          Convertimos la información de tu crédito en un diagnóstico
+          claro para ayudarte a entender dónde estás y qué alternativas
+          podrías evaluar.
+        </p>
+      </div>
+
+      <div class="cards">
+
+        <div class="card">
+          <div class="number">01</div>
+
+          <h3>Analizamos tu crédito</h3>
+
+          <p>
+            Revisamos saldo, tasa, cuota, plazo, sistema de amortización
+            y demás condiciones relevantes de tu crédito de vivienda.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="number">02</div>
+
+          <h3>Evaluamos escenarios</h3>
+
+          <p>
+            Comparamos diferentes alternativas financieras para identificar
+            posibles oportunidades de ahorro o mejora.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="number">03</div>
+
+          <h3>Te ayudamos a decidir</h3>
+
+          <p>
+            Presentamos la información de forma clara para que puedas
+            tomar decisiones mejor fundamentadas sobre tu vivienda.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="process" id="proceso">
+
+    <div class="container">
+
+      <div class="section-title">
+
+        <h2>Un proceso sencillo y personalizado</h2>
+
+        <p>
+          Cada crédito es diferente. Por eso nuestro análisis comienza
+          entendiendo las condiciones reales de cada cliente.
+        </p>
+
+      </div>
+
+      <div class="cards">
+
+        <div class="card">
+          <div class="number">PASO 1</div>
+
+          <h3>Información</h3>
+
+          <p>
+            Recopilamos la información necesaria de tu crédito actual.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="number">PASO 2</div>
+
+          <h3>Diagnóstico</h3>
+
+          <p>
+            Analizamos las condiciones actuales y construimos escenarios
+            comparables.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="number">PASO 3</div>
+
+          <h3>Alternativas</h3>
+
+          <p>
+            Te mostramos las opciones identificadas y sus posibles impactos
+            financieros.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="contact" id="contacto">
+
+    <div class="container">
+
+      <div class="section-title">
+
+        <h2>Broker52</h2>
+
+        <p>
+          Revisión y análisis de créditos de vivienda.
+        </p>
+
+      </div>
+
+      <div class="contact-box">
+
+        <p>
+          <strong>Contacto:</strong>
+        </p>
+
+        <p>
+          +61 405 913 338
+        </p>
+
+        <p>
+          Sitio oficial:
+          <strong>broker52.co</strong>
+        </p>
+
+      </div>
+
+      <div class="legal">
+        Broker52 presta servicios de análisis y consultoría.
+        No es una entidad bancaria ni financiera y no garantiza
+        la aprobación de créditos, modificaciones contractuales,
+        reducciones de tasas, intereses o plazos.
+        Los resultados dependen de las condiciones particulares
+        de cada cliente y de las entidades financieras correspondientes.
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<footer>
+  © 2026 Broker52. Todos los derechos reservados.
+</footer>
+
+</body>
+</html>
