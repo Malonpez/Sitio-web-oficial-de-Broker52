@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador BROKER52</title>
+<meta name="description" content="Simulador de reducción de plazo para créditos de vivienda en pesos. Cálculo estimado, hecho en tu navegador.">
+<style>
+:root{--teal950:#032f2e;--teal900:#063d3b;--teal800:#075652;--teal700:#08746d;--teal600:#0b837b;--gold:#d79a23;--gold2:#f0c15a;--ink:#082b2d;--muted:#647579;--line:#dce8e8;--bg:#f6fafb;--soft:#eef8f6;--danger:#b31343;--warn:#c46a0a;--ok:#0d7c59;--shadow:0 24px 70px rgba(8,43,45,.12)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 40px}
+.hero{background:linear-gradient(135deg,var(--teal800),var(--teal950));color:#fff;border-radius:22px;padding:26px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px;box-shadow:var(--shadow)}
+.brandline{display:flex;align-items:center;gap:14px}
+.mark{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--teal950);display:grid;place-items:center;font-weight:950;font-size:22px;flex:none}
+.brand-title{font-weight:950;font-size:22px;letter-spacing:.3px}.brand-title span{color:var(--gold2)}
+.brand-sub{opacity:.85;font-size:13px;font-weight:700}
+.hero p{margin:0;max-width:460px;font-size:14px;opacity:.9}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 18px}
+.steps button{border:1px solid var(--line);background:#fff;color:var(--teal800);border-radius:999px;padding:9px 16px;font-weight:850;font-size:13px;cursor:pointer}
+.steps button.active{background:var(--teal800);border-color:var(--teal800);color:#fff}
+.steps button:disabled{opacity:.45;cursor:not-allowed}
+.panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:var(--shadow)}
+.panel h2{margin:0 0 6px;color:var(--teal800);font-size:22px}
+.muted-note{color:var(--muted);font-size:14px;margin:0 0 16px}
+.hidden{display:none!important}
+.topgap{margin-top:20px}
+.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 16px}
+.form-grid label{display:grid;gap:6px;font-size:12px;font-weight:850;color:#557075;text-transform:uppercase;letter-spacing:.35px}
+.form-grid input,.form-grid select{border:1px solid #cfe0df;border-radius:12px;padding:11px 12px;background:#fbfdfd;color:var(--ink);font-size:15px;font-weight:700;text-transform:none;letter-spacing:0;width:100%}
+.form-grid input:focus,.form-grid select:focus{outline:none;border-color:var(--teal700);box-shadow:0 0 0 3px rgba(8,116,109,.14)}
+.form-grid .hint{font-size:11px;color:#86979a;font-weight:700;text-transform:none;letter-spacing:0}
+.cov-box{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 16px;background:#fff8ea;border:1px solid #f0cf91;border-radius:16px;padding:16px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;margin-top:22px}
+.btn{border:0;border-radius:14px;background:linear-gradient(135deg,var(--teal800),var(--teal950));color:#fff;font-weight:850;padding:14px 22px;box-shadow:0 15px 28px rgba(3,60,58,.24);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#b8790f);box-shadow:0 15px 28px rgba(183,121,15,.25)}
+.secondary{border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--teal800);font-weight:850;padding:13px 20px;cursor:pointer}
+.alert{border:1px solid #f2b7c6;background:#fff0f3;color:var(--danger);border-radius:14px;padding:12px 14px;font-weight:800;font-size:14px;margin-top:14px}
+.metrics{display:grid;gap:16px}
+.metrics article{background:var(--soft);border:1px solid #d4e8e6;border-radius:16px;padding:16px}
+.metrics small{display:block;color:#5b7073;font-weight:850;text-transform:uppercase;font-size:11px;letter-spacing:.5px}
+.metrics strong{display:block;font-size:20px;color:var(--teal800);margin-top:4px}
+.metrics article.metric-featured{background:linear-gradient(135deg,#fff8ea,#ffffff);border:2px solid var(--gold)}
+.metrics article.metric-featured strong{font-size:24px;color:var(--teal900)}
+.metrics article.metric-featured small{color:#8a520b}
+.metric-row{display:grid;gap:16px}
+.metric-row.top{grid-template-columns:repeat(4,minmax(0,1fr))}
+.metric-row.bottom{grid-template-columns:repeat(3,minmax(0,1fr))}
+.metrics.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.proposal-context{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0 20px}
+.proposal-context .box{background:#f7fbfb;border:1px solid var(--line);border-radius:14px;padding:14px}
+.proposal-context small{display:block;color:#607277;text-transform:uppercase;font-size:11px;font-weight:900;letter-spacing:.45px}
+.proposal-context strong{display:block;color:var(--teal800);font-size:16px;margin-top:5px}
+.proposal-context span{display:block;color:#708388;font-size:12px;margin-top:4px;font-weight:700}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.scenario-card{border:1px solid var(--line);background:#fff;border-radius:16px;padding:0;overflow:hidden;text-align:left;display:grid;gap:0;cursor:pointer;color:inherit;width:100%}
+.scenario-card.selected{border-color:var(--teal700);box-shadow:0 0 0 3px rgba(8,116,109,.12)}
+.sc-head{padding:16px;background:linear-gradient(135deg,#f6fbfb,#fff);border-bottom:1px solid var(--line)}
+.scenario-card.selected .sc-head{background:linear-gradient(135deg,#eaf8f6,#fff8ea)}
+.sc-title{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.sc-title span{font-size:13px;color:#557075;font-weight:900}
+.sc-title b{background:#eef8f6;color:var(--teal800);border-radius:999px;padding:5px 9px;font-size:12px}
+.sc-head strong{font-size:18px;margin-top:8px;display:block;color:var(--teal800)}
+.sc-head em{font-style:normal;font-weight:950;color:var(--gold);font-size:18px;margin-top:2px;display:block}
+.sc-head em.neg{color:var(--danger)}
+.sc-body{display:grid;gap:0}
+.sc-row{display:flex;justify-content:space-between;gap:10px;padding:9px 14px;border-bottom:1px solid #edf2f2;font-size:12px;align-items:flex-start}
+.sc-row:last-child{border-bottom:0}
+.sc-row span{color:#63777b;font-weight:800}
+.sc-row b{color:#19383b;text-align:right}
+.sc-row.highlight{background:#fff8ea}
+.sc-row.highlight b{color:#99640c}
+.custom-box{grid-column:1/-1;border:1px dashed #b9d4d2;border-radius:16px;padding:16px;background:#f7fbfb;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;align-items:end}
+.custom-box h3{margin:0;color:var(--teal800);font-size:16px}
+.custom-box p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.custom-box label{display:grid;gap:6px;font-size:12px;font-weight:850;color:#557075;text-transform:uppercase}
+.custom-box input{border:1px solid #cfe0df;border-radius:12px;padding:10px 12px;font-size:15px;font-weight:700;background:#fff}
+.scenario-visuals{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+.chart-box{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 32px rgba(8,43,45,.06);min-width:0}
+.chart-box h3{margin:0 0 12px;font-size:17px;color:var(--teal900);display:flex;align-items:center;gap:8px}
+.chart-svg{width:100%;height:auto;display:block}
+.chart-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:12px;font-weight:800;color:#4b5f63}
+.chart-legend span{display:inline-flex;align-items:center;gap:6px}
+.legend-dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+.dot-saldo{background:#0f766e}.dot-interes{background:#ef4444}.dot-capital{background:#10b981}.dot-seguro{background:#3b82f6}.dot-gold{background:#b68b2f}
+.amort-panel{margin-top:20px;border:1px solid var(--line);border-radius:18px;padding:20px;background:#fff}
+.amort-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.amort-head h2{font-size:19px}
+.amort-actions{display:flex;gap:8px;flex-wrap:wrap}
+.amort-toggle{border:1px solid var(--line);background:#fff;color:var(--teal800);border-radius:12px;padding:9px 13px;font-weight:850;font-size:13px;cursor:pointer}
+.amort-toggle.active{background:var(--teal800);color:#fff;border-color:var(--teal800)}
+.amort-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
+.amort-summary article{background:#f7fbfb;border:1px solid var(--line);border-radius:14px;padding:12px}
+.amort-summary small{display:block;color:#607277;font-size:11px;text-transform:uppercase;font-weight:900}
+.amort-summary strong{color:var(--teal800);font-size:16px}
+.amort-table-wrap{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:14px}
+.amort-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:820px}
+.amort-table th{position:sticky;top:0;background:var(--teal800);color:#fff;padding:10px 8px;text-align:right;font-weight:850;white-space:nowrap}
+.amort-table th:first-child,.amort-table td:first-child{text-align:center}
+.amort-table td{padding:8px;border-bottom:1px solid #edf2f2;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.amort-table tbody tr:nth-child(even) td{background:#fafcfc}
+.money-blue{color:#2563eb}.money-gold{color:#99640c;font-weight:800}.money-green{color:#0d7c59}.money-purple{color:#6d28d9}.money-red{color:#dc2626}.money-saldo{color:var(--teal800);font-weight:800}
+.amort-note{font-size:12px;color:var(--muted);margin:10px 0 0}
+.quote-doc{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#fff}
+.q-top{height:8px;background:linear-gradient(90deg,var(--teal800),var(--gold))}
+.q-head{padding:24px;background:linear-gradient(135deg,#f6fbfb,#fff);border-bottom:1px solid var(--line);display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+.q-head h1{margin:14px 0 6px;font-size:22px;color:var(--teal900)}
+.q-head p{margin:0;color:var(--muted);font-size:13px}
+.q-meta{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.q-meta small{display:block;color:#607277;font-size:11px;text-transform:uppercase;font-weight:900}
+.q-meta strong{font-size:14px;color:var(--teal800)}
+.q-body{padding:24px}
+.q-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.q-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#f7fbfb}
+.q-card.green{background:linear-gradient(135deg,#eaf8f1,#fff);border-color:#bfe5d3}
+.q-card.gold{background:linear-gradient(135deg,#fff8ea,#fff);border-color:#f0cf91}
+.q-card small{display:block;color:#607277;font-size:11px;text-transform:uppercase;font-weight:900}
+.q-card strong{display:block;font-size:19px;color:var(--teal900);margin:4px 0}
+.q-card span{font-size:12px;color:var(--muted);font-weight:700}
+.q-table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+.q-table td{padding:11px 12px;border-bottom:1px solid #edf2f2}
+.q-table td:first-child{color:#557075;font-weight:800;width:42%}
+.q-table td:last-child{text-align:right;font-weight:800;color:#19383b}
+.pay-mode{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.legal{margin-top:20px;font-size:12px;color:#5b7073;background:#f7fbfb;border:1px solid var(--line);border-radius:14px;padding:14px}
+.legal b{color:var(--teal800)}
+.footer-note{text-align:center;font-size:12px;color:#7d8e91;margin-top:18px}
+@media(max-width:980px){
+  .form-grid,.cov-box{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .scenario-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .proposal-context,.metric-row.top,.amort-summary,.q-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .scenario-visuals,.q-head{grid-template-columns:1fr}
+  .custom-box{grid-template-columns:1fr 1fr}.custom-box>div:first-child{grid-column:1/-1}
+}
+@media(max-width:640px){
+  .wrap{padding:16px 12px 30px}
+  .hero{flex-direction:column;align-items:flex-start;padding:22px}
+  .panel{padding:18px;border-radius:18px}
+  .form-grid,.cov-box,.scenario-grid,.metric-row.top,.metric-row.bottom,.metrics.three,.custom-box{grid-template-columns:1fr}
+  .proposal-context,.amort-summary,.q-summary{grid-template-columns:1fr 1fr}
+  .actions{justify-content:stretch}.actions .btn,.actions .secondary{flex:1}
+}
+@media print{
+  body{background:#fff}.steps,.actions,.amort-actions,.no-print,.hero{display:none!important}
+  .panel{box-shadow:none;border:0;padding:0}.amort-table-wrap{max-height:none;overflow:visible}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="brandline">
+      <div class="mark">52</div>
+      <div><div class="brand-title">BROKER52 <span>PRO</span></div><div class="brand-sub">Simulador de reducción de plazo · créditos en pesos</div></div>
+    </div>
+    <p>Ingresa los datos de tu extracto. El cálculo se hace solo en tu navegador: no guardamos ni enviamos tu información.</p>
+  </header>
+
+  <nav class="steps" aria-label="Pasos del simulador">
+    <button type="button" data-step="pre" class="active">1 · Diagnóstico preliminar</button>
+    <button type="button" data-step="esc" disabled>2 · Escenarios</button>
+    <button type="button" data-step="cot" disabled>3 · Cotización</button>
+  </nav>
+
+  <!-- PASO 1 -->
+  <section class="panel" id="step-pre">
+    <h2>Datos de tu crédito actual</h2>
+    <p class="muted-note">Todos los valores están en tu último extracto. El ejemplo cargado es un caso técnico ficticio; reemplázalo con tus datos.</p>
+    <div class="form-grid">
+      <label>Tipo de crédito
+        <select id="f-tipo">
+          <option value="FRANCES">Pesos · cuota fija (sistema francés)</option>
+          <option value="CREDITO_COBERTURA">Pesos · con cobertura de tasa (Mi Casa Ya / FRECH)</option>
+        </select>
+      </label>
+      <label>Banco <input id="f-banco" type="text" placeholder="Opcional"></label>
+      <label>Saldo actual de capital <input id="f-saldo" class="money" inputmode="decimal"><span class="hint">“Nuevo saldo” o “saldo a la fecha de corte”</span></label>
+      <label>Tasa de interés E.A. (%) <input id="f-tasa" inputmode="decimal"><span class="hint">Tasa cobrada efectiva anual</span></label>
+      <label>Plazo inicial (meses) <input id="f-plazo" inputmode="numeric"></label>
+      <label>Cuotas pagadas <input id="f-pagadas" inputmode="numeric"><span class="hint">Las cuotas restantes se calculan solas</span></label>
+      <label>Cuota mensual que pagas <input id="f-cuota" class="money" inputmode="decimal"><span class="hint">Incluye seguros</span></label>
+      <label>Seguros mensuales <input id="f-seguros" class="money" inputmode="decimal"><span class="hint">Vida + incendio y terremoto</span></label>
+      <label>Valor inicial del crédito <input id="f-inicial" class="money" inputmode="decimal" placeholder="Opcional"><span class="hint">Si lo dejas vacío se estima</span></label>
+      <div class="cov-box hidden" id="cov-box">
+        <label>Cobertura mensual del gobierno <input id="f-cob-valor" class="money" inputmode="decimal"><span class="hint">“Cobertura de tasa” en el extracto</span></label>
+        <label>Meses de cobertura restantes <input id="f-cob-meses" inputmode="numeric"><span class="hint">La cobertura dura 84 meses desde el desembolso</span></label>
+        <label>Cuota total del banco <input id="f-cuota-banco" class="money" inputmode="decimal" placeholder="Opcional"><span class="hint">“Valor cuota total”; si falta = cuota + cobertura</span></label>
+      </div>
+    </div>
+    <div id="pre-error" class="alert hidden"></div>
+    <div class="actions">
+      <button type="button" class="secondary" id="btn-ejemplo">Cargar ejemplo</button>
+      <button type="button" class="btn" id="btn-calc">Calcular diagnóstico ›</button>
+    </div>
+
+    <div id="pre-result" class="hidden">
+      <h2 class="topgap">Diagnóstico preliminar</h2>
+      <p class="muted-note" id="pre-note"></p>
+      <div class="metrics" id="pre-metrics"></div>
+      <div class="actions"><button type="button" class="btn" id="btn-to-esc">Ver escenarios de reducción ›</button></div>
+    </div>
+  </section>
+
+  <!-- PASO 2 -->
+  <section class="panel hidden" id="step-esc">
+    <h2>Escenarios sistema francés</h2>
+    <p class="muted-note">Seis opciones de reducción de plazo calculadas con el motor de BROKER52 y una opción personalizada. Pulsa una tarjeta para ver sus gráficos y su tabla.</p>
+    <div class="proposal-context" id="esc-context"></div>
+    <div class="scenario-grid" id="esc-grid"></div>
+    <div class="metrics three topgap" id="esc-selected"></div>
+    <div class="actions"><button type="button" class="btn gold" id="btn-to-cot">Seleccionar opción y ver cotización ›</button></div>
+    <div id="esc-visuals"></div>
+  </section>
+
+  <!-- PASO 3 -->
+  <section class="panel hidden" id="step-cot">
+    <div id="cot-doc"></div>
+    <div class="pay-mode no-print" id="pay-mode">
+      <button type="button" class="amort-toggle active" data-pay="CONTADO">Contado</button>
+      <button type="button" class="amort-toggle" data-pay="TRES_ABONOS">3 abonos</button>
+    </div>
+    <div class="actions">
+      <button type="button" class="secondary" id="btn-back-esc">‹ Volver a escenarios</button>
+      <button type="button" class="secondary" id="btn-print">Imprimir / guardar PDF</button>
+      <a class="btn gold" id="btn-contacto" href="https://broker52.co/#contacto" target="_top" rel="noopener">Quiero que revisen mi crédito ›</a>
+    </div>
+  </section>
+
+  <div class="legal">
+    <b>Importante.</b> BROKER52 presta asesoría y análisis de créditos de vivienda para acompañarte ante tu entidad financiera en procesos de reducción de plazo. <b>No es un gestor de crédito:</b> no otorga, no tramita ni administra créditos. Los resultados son estimaciones matemáticas basadas en los datos que ingresas; no constituyen oferta, aprobación ni compromiso del banco, y pueden diferir de la liquidación oficial de la entidad. Esta página no almacena ni transmite tus datos.
+  </div>
+  <p class="footer-note">BROKER52 · Motor de cálculo v5.0.9 (sistema francés en pesos)</p>
+</div>
+
+<script>
+(function(){
+'use strict';
+/* ===== Configuración pública ===== */
+const CONFIG={
+  mostrarHonorarios:true,      // false = la cotización muestra solo el ahorro
+  porcentajeHonorarios:5.95,   // DEFAULT_COMMISSION_PCT de la app
+  vigenciaDias:14,
+  abonosDias:[3,7,14],
+  contactoUrl:'https://broker52.co/#contacto'
+};
+
+/* ===== Formato (idéntico a la app) ===== */
+const CO=new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',minimumFractionDigits:2,maximumFractionDigits:2});
+function cop(v){return CO.format(Number.isFinite(v)?v:0).replace('COP','').trim()}
+function pct(v,d=2){return (Number.isFinite(v)?v:0).toLocaleString('es-CO',{minimumFractionDigits:d,maximumFractionDigits:d})+'%'}
+function parseCO(x){if(typeof x==='number')return x;let s=String(x||'').trim();if(!s)return 0;s=s.replace(/[^0-9,.-]/g,'');if(s.includes(',')){s=s.replace(/\./g,'').replace(',','.')}else{s=s.replace(/,/g,'')}let n=Number(s);return Number.isFinite(n)?n:0}
+/* Lectura de montos escritos a mano: b52ParseManualFee de la app ("403.000" = 403000; "61.140,50" = 61140,5). */
+function parseMoney(x){
+  if(typeof x==='number')return Number.isFinite(x)?x:0;
+  let s=String(x??'').trim();
+  if(!s)return 0;
+  const negative=/^-/.test(s);
+  s=s.replace(/[^0-9,.-]/g,'').replace(/-/g,'');
+  if(!s)return 0;
+  const commas=(s.match(/,/g)||[]).length,dots=(s.match(/\./g)||[]).length;
+  const lastComma=s.lastIndexOf(','),lastDot=s.lastIndexOf('.');
+  let decimalSep='';
+  if(commas&&dots){decimalSep=lastComma>lastDot?',':'.';}
+  else if(commas===1){const tail=s.length-lastComma-1;if(tail>0&&tail<=2)decimalSep=',';}
+  else if(dots===1){const tail=s.length-lastDot-1;if(tail>0&&tail<=2)decimalSep='.';}
+  let normalized='';
+  if(decimalSep){
+    const idx=s.lastIndexOf(decimalSep);
+    const integer=s.slice(0,idx).replace(/[.,]/g,'')||'0';
+    const fraction=s.slice(idx+1).replace(/[.,]/g,'');
+    normalized=integer+(fraction?'.'+fraction:'');
+  }else normalized=s.replace(/[.,]/g,'');
+  let n=Number(normalized);
+  if(!Number.isFinite(n))return 0;
+  if(negative)n=-n;
+  return n;
+}
+function parseNum(x){let s=String(x||'').trim().replace(/\s/g,'');if(!s)return 0;if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');const n=Number(s);return Number.isFinite(n)?n:0}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+/* ===== MOTOR — copia literal de BROKER52-PRO-v526-FINAL-CERTIFICADA.html (bloque v5.0.9 / V422).
+   Se conservan solo las ramas en pesos (FRANCES / CREDITO_COBERTURA); las ramas UVR se omiten porque este simulador no las usa. ===== */
+function eaM(ea){return Math.pow(1+(Number(ea)||0)/100,1/12)-1}
+function pmt(pv,r,months){months=Math.max(1,Math.round(months||1));if(Math.abs(r)<1e-14)return pv/months;return pv*r/(1-Math.pow(1+r,-months))}
+function isUVR(type){return ['UVR','UVR_FIJA','UVR_BAJA','UVR_MEDIA','UVR_BENEFICIO','CREDITO_COBERTURA_UVR'].includes(type)}
+function stageRate(c,m){
+ if(c.type==='UVR_MEDIA')return c.mediaRate||c.rate||c.contractualRate;
+ if(c.type==='UVR_BENEFICIO')return m<=c.benefitMonths?(c.benefitRate||c.rate):(c.contractualRate||c.rate);
+ if(c.coverageType==='RATE_POINTS'&&c.coveragePoints>0&&m<=c.coverageMonths){const mc=Math.pow(1+(c.rate||c.contractualRate)/100,1/12)-1,mp=Math.pow(1+c.coveragePoints/100,1/12)-1,mm=mc-mp;return mm<=0?0:(Math.pow(1+mm,12)-1)*100}
+ return c.rate||c.contractualRate;
+}
+function insuranceFor(c,balancePesos){return c.insuranceMode==='BALANCE_RATE'?Math.max(0,balancePesos*(c.insuranceRate/100)):c.insurance}
+function simulate(c){
+ c={...c};const rows=[];let totalClient=0,totalBank=0,totalInterest=0,totalCapital=0,totalInsurance=0,totalCoverage=0;
+ let remaining=Math.max(1,c.term),month=0;const max=remaining;let previousRate=null;
+ let bal=c.balance;let finance=Math.max(0,c.grossPayment-c.insurance);if(!finance)finance=pmt(bal,eaM(stageRate(c,1)),remaining);
+ while(bal>0.01&&month<max){month++;const rateEA=stageRate(c,month),r=eaM(rateEA);
+  if(previousRate!==null&&Math.abs(rateEA-previousRate)>1e-9&&c.transitionMode==='RECALC_PAYMENT')finance=pmt(bal,r,Math.max(1,remaining));
+  const open=bal,ins=insuranceFor(c,open),interest=open*r;if(c.forceTerm&&remaining===1)finance=open+interest;
+  let capital=Math.max(0,finance-interest);if(capital>open){capital=open;finance=interest+capital}
+  let gross=finance+ins,coverage=0;if(month<=c.coverageMonths&&c.coverageType==='MONTHLY_AMOUNT')coverage=Math.min(c.coverageAmount,interest,gross);
+  const client=Math.max(0,gross-coverage);bal=Math.max(0,open-capital);
+  rows.push({month,rateEA,openingBalance:open,grossPayment:gross,clientPayment:client,coverage,insurance:ins,interest,capital,closingBalance:bal});
+  totalClient+=client;totalBank+=gross;totalInterest+=interest;totalCapital+=capital;totalInsurance+=ins;totalCoverage+=coverage;remaining=Math.max(0,remaining-1);previousRate=rateEA;if(remaining===0&&bal>0.01)remaining=1;
+ }
+ return {rows,months:month,endingBalance:bal,totalClient,totalBank,totalInterest,totalCapital,totalInsurance,totalCoverage,totalIndexation:0,paidOff:bal<=0.01,first:rows[0]||null,maxClientPayment:rows.reduce((m,r)=>Math.max(m,r.clientPayment),0)};
+}
+function projectCashflow(c,term,startGross,simRows){
+ term=Math.max(1,Math.round(term||c.term));startGross=Math.max(0,Number(startGross??c.grossPayment)||0);const rows=[];let totalBank=0,totalClient=0,maxClientPayment=0;
+ const infM=isUVR(c.type)?eaM(c.inflation):0;const finance0=Math.max(0,startGross-c.insurance);
+ for(let m=1;m<=term;m++){const ins=c.insuranceMode==='BALANCE_RATE'?(simRows?.[m-1]?.insurance??c.insurance):c.insurance;const finance=isUVR(c.type)?finance0*Math.pow(1+infM,m-1):finance0;const gross=finance+ins;const interest=simRows?.[m-1]?.interest??Infinity;let coverage=0;if(m<=c.coverageMonths&&c.coverageType==='MONTHLY_AMOUNT')coverage=Math.min(c.coverageAmount,interest,gross);const client=Math.max(0,gross-coverage);rows.push({month:m,grossPayment:gross,clientPayment:client,coverage,insurance:ins});totalBank+=gross;totalClient+=client;maxClientPayment=Math.max(maxClientPayment,client)}
+ return {rows,totalBank,totalClient,maxClientPayment};
+}
+function proposalConfig(base,targetTerm){
+ const c={...base,term:Math.max(1,targetTerm),proposal:true,forceTerm:true};const r=eaM(stageRate(c,1));
+ const finance=pmt(c.balance,r,c.term);c.grossPayment=finance+c.insurance;c.clientPayment=Math.max(0,c.grossPayment-(c.coverageMonths?Math.min(c.coverageAmount,c.balance*r):0));
+ return c;
+}
+function b509PV(payment,ea,months){
+ const r=Math.pow(1+(Number(ea)||0)/100,1/12)-1;
+ if(!(payment>0&&months>0))return {value:0,r};
+ return {value:Math.abs(r)<1e-14?payment*months:payment*(1-Math.pow(1+r,-months))/r,r};
+}
+/* ===== Fin del motor copiado ===== */
+
+/* formConfig de la app, alimentado desde el formulario público (solo modalidades en pesos). */
+function baseConfig(d){
+ let gross=d.cuotaBanco;if(!gross)gross=d.cuota+(d.cobValor>0?d.cobValor:0);
+ return {type:d.tipo,balance:d.saldo,balanceUvr:0,uvr:0,term:d.restante,insurance:d.seguros,clientPayment:d.cuota,grossPayment:gross,rate:d.tasa,contractualRate:d.tasa,mediaRate:d.tasa,benefitRate:d.tasa,
+  benefitMonths:0,coverageAmount:d.tipo==='CREDITO_COBERTURA'?d.cobValor:0,coveragePoints:0,coverageType:'MONTHLY_AMOUNT',coverageMonths:d.tipo==='CREDITO_COBERTURA'?d.cobMeses:0,inflation:8,
+  insuranceMode:'FIXED',insuranceRate:0,transitionMode:'RECALC_PAYMENT',statementInterest:0,paymentUvr:0,periodDays:30,installmentNumber:0,respectStatementTerm:true,forceTerm:false,proposal:false};
+}
+
+/* Escenarios 1–6: misma fórmula que scenarioDataFromPre (proveedor V422 / v5.0.9). */
+function scenarios(d){
+ const base=baseConfig(d);
+ const current=simulate(base),currentFlow=projectCashflow(base,base.term,base.grossPayment,current.rows),reductions=[24,36,48,60,72,84];
+ return reductions.map((red,i)=>{const nt=Math.max(1,base.term-Math.min(red,base.term-1)),pc=proposalConfig(base,nt),ps=simulate(pc),first=ps.first||{},proposalFlow=projectCashflow(pc,nt,first.grossPayment||pc.grossPayment,ps.rows);return {opcion:i+1,nombre:['Primera','Segunda','Tercera'][i%3],grupo:i<3?'A':'B',tasaEA:(stageRate(base,1)||0)/100,deuda:base.balance,plazoActual:base.term,cuotaActual:base.clientPayment,nuevoPlazo:nt,meses:base.term-nt,cuota:first.clientPayment||pc.clientPayment,cuotaBanco:first.grossPayment||pc.grossPayment,diferencia:(first.clientPayment||0)-base.clientPayment,totalActual:currentFlow.totalBank,total:proposalFlow.totalBank,ahorro:currentFlow.totalBank-proposalFlow.totalBank,totalClienteActual:currentFlow.totalClient,totalCliente:proposalFlow.totalClient,seguro:base.insurance,ingresoRequerido:(first.clientPayment||pc.clientPayment||0)/0.30,_cfg:pc}});
+}
+/* Opción 7 personalizada: misma regla que v374CustomScenario (plazo por defecto = restante − 120). */
+function customScenario(data,state){
+ const b=data[0];
+ const term=Math.max(1,Math.min(b.plazoActual,Math.round(state.term||Math.max(1,b.plazoActual-120))));
+ const rate=Math.pow(1+(b.tasaEA>1?b.tasaEA/100:b.tasaEA),1/12)-1;
+ const auto=!b.deuda?b.cuotaActual:(rate<=0?b.deuda/term+b.seguro:b.deuda*rate/(1-Math.pow(1+rate,-term))+b.seguro);
+ const payment=state.payment>0?state.payment:auto;
+ const total=payment*term;
+ return {...b,opcion:7,nombre:'Personalizada',grupo:'C',nuevoPlazo:term,meses:Math.max(0,b.plazoActual-term),cuota:payment,cuotaBanco:payment,diferencia:payment-b.cuotaActual,total,ahorro:b.totalActual-total,ingresoRequerido:payment/0.30,custom:true,
+  _cfg:{...b._cfg,term,forceTerm:true,grossPayment:payment,clientPayment:payment}};
+}
+
+/* ===== Estado y lectura del formulario ===== */
+const S={data:null,list:[],sel:1,custom:{term:0,payment:0},full:false,pay:'CONTADO'};
+const $=id=>document.getElementById(id);
+const EJEMPLO={tipo:'FRANCES',banco:'Banco de ejemplo',saldo:175307749,tasa:'13,35',plazo:240,pagadas:4,cuota:2083595,seguros:85608,inicial:'',cobValor:'',cobMeses:'',cuotaBanco:''};
+function loadExample(){
+ $('f-tipo').value=EJEMPLO.tipo;$('f-banco').value=EJEMPLO.banco;$('f-saldo').value=cop(EJEMPLO.saldo);$('f-tasa').value=EJEMPLO.tasa;$('f-plazo').value=EJEMPLO.plazo;$('f-pagadas').value=EJEMPLO.pagadas;
+ $('f-cuota').value=cop(EJEMPLO.cuota);$('f-seguros').value=cop(EJEMPLO.seguros);$('f-inicial').value='';$('f-cob-valor').value='';$('f-cob-meses').value='';$('f-cuota-banco').value='';syncTipo();
+}
+function syncTipo(){$('cov-box').classList.toggle('hidden',$('f-tipo').value!=='CREDITO_COBERTURA')}
+function readForm(){
+ const d={tipo:$('f-tipo').value,banco:$('f-banco').value.trim(),saldo:parseMoney($('f-saldo').value),tasa:parseNum($('f-tasa').value),plazo:Math.round(parseNum($('f-plazo').value)),pagadas:Math.round(parseNum($('f-pagadas').value)),
+  cuota:parseMoney($('f-cuota').value),seguros:parseMoney($('f-seguros').value),inicial:parseMoney($('f-inicial').value),cobValor:parseMoney($('f-cob-valor').value),cobMeses:Math.round(parseNum($('f-cob-meses').value)),cuotaBanco:parseMoney($('f-cuota-banco').value)};
+ d.restante=Math.max(0,d.plazo-d.pagadas);
+ const err=[];
+ if(!(d.saldo>0))err.push('el saldo actual');
+ if(!(d.tasa>0&&d.tasa<60))err.push('una tasa E.A. válida (entre 0 y 60%)');
+ if(!(d.plazo>0))err.push('el plazo inicial');
+ if(!(d.restante>=25))err.push('cuotas restantes suficientes (mínimo 25 para reducir plazo)');
+ if(!(d.cuota>0))err.push('la cuota mensual');
+ if(d.seguros<0||d.seguros>=d.cuota)err.push('seguros menores que la cuota');
+ if(d.tipo==='CREDITO_COBERTURA'&&(!(d.cobValor>0)||!(d.cobMeses>0)))err.push('la cobertura mensual y sus meses restantes');
+ if(!err.length){
+  const gross=d.cuotaBanco||d.cuota+(d.tipo==='CREDITO_COBERTURA'?d.cobValor:0);
+  const interes1=d.saldo*eaM(d.tasa);
+  if(gross-d.seguros<=interes1)err.push('una cuota que cubra los intereses del mes: con esa tasa y ese saldo la cuota no amortiza capital. Revisa la tasa (E.A.) y la cuota');
+ }
+ return {d,err};
+}
+
+/* ===== Paso 1: diagnóstico preliminar (calcPreliminar v5.0.9) ===== */
+function calcPre(){
+ const {d,err}=readForm();const box=$('pre-error');
+ if(err.length){box.textContent='Revisa: '+err.join('; ')+'.';box.classList.remove('hidden');$('pre-result').classList.add('hidden');lockSteps();return;}
+ box.classList.add('hidden');
+ if(d.tipo!=='CREDITO_COBERTURA'){d.cobValor=0;d.cobMeses=0;d.cuotaBanco=0}
+ const base=baseConfig(d),sim=simulate(base),flow=projectCashflow(base,base.term,base.grossPayment,sim.rows);
+ const paidEst=d.cuota*d.pagadas,lifetime=paidEst+flow.totalClient;
+ const desemb=d.inicial>0?d.inicial:b509PV(Math.max(0,base.grossPayment-d.seguros),d.tasa,d.plazo).value;
+ const capitalNet=Math.max(0,desemb-d.saldo),insurancePaid=d.seguros*d.pagadas,interestPaid=Math.max(0,paidEst-capitalNet-insurancePaid),times=desemb>0?lifetime/desemb:0;
+ $('pre-note').textContent=(d.inicial>0?'Valor inicial tomado de tus datos.':'Valor inicial estimado como valor presente de la cuota financiera (cuota sin seguros) a la tasa y plazo inicial.')+` Cuotas restantes: ${d.restante}.`+(d.tipo==='CREDITO_COBERTURA'?' Con cobertura, el valor final por pagar refleja lo que pagas tú; la cobertura del gobierno se descuenta mientras esté vigente.':'');
+ $('pre-metrics').innerHTML=`<article class="metric-featured"><small>Valor total del crédito desembolsado al cliente</small><strong>${cop(desemb)}</strong></article><div class="metric-row top"><article><small>Valor préstamo</small><strong>${cop(desemb)}</strong></article><article><small>Valor final por pagar</small><strong>${cop(lifetime)}</strong></article><article><small>Saldo actual</small><strong>${cop(d.saldo)}</strong></article><article><small>Nro veces x pagar</small><strong>${times.toFixed(2)}x</strong></article></div><div class="metric-row bottom"><article><small>Valor pagado</small><strong>${cop(paidEst)}</strong></article><article><small>Pago aplicado capital</small><strong>${cop(capitalNet)}</strong></article><article><small>Pago aplicado intereses</small><strong>${cop(interestPaid)}</strong></article></div>`;
+ $('pre-result').classList.remove('hidden');
+ S.data=d;S.sel=1;S.custom={term:0,payment:0};S.full=false;
+ document.querySelector('[data-step="esc"]').disabled=false;document.querySelector('[data-step="cot"]').disabled=true;
+ notifyHeight();
+}
+function lockSteps(){document.querySelector('[data-step="esc"]').disabled=true;document.querySelector('[data-step="cot"]').disabled=true}
+
+/* ===== Gráficos (mismas funciones SVG de la app) ===== */
+function genericBarChartSvg(title,subtitle,bars){
+  const w=640,h=72+bars.length*52,p=32;const vals=bars.map(b=>Math.max(0,Number(b.value)||0));const max=Math.max(...vals,1);const areaW=w-(p*2);const barH=34,gap=18;
+  const rows=bars.map((b,i)=>{const y=76+i*(barH+gap);const width=Math.max(6,(Math.max(0,Number(b.value)||0)/max)*areaW);const fill=b.fill||['#0f766e','#b68b2f','#2563eb','#10b981'][i%4];
+    return `<text x="${p}" y="${y-8}" font-size="14" fill="#334155" font-weight="850">${b.label}</text><rect x="${p}" y="${y}" width="${areaW}" height="${barH}" rx="11" fill="#edf4f3"/><rect x="${p}" y="${y}" width="${width}" height="${barH}" rx="11" fill="${fill}"/>${width>areaW-170?`<text x="${p+width-12}" y="${y+23}" text-anchor="end" font-size="15" fill="#ffffff" font-weight="900">${cop(Number(b.value)||0)}</text>`:`<text x="${p+width+10}" y="${y+23}" font-size="15" fill="#0b3b3c" font-weight="900">${cop(Number(b.value)||0)}</text>`}`}).join('');
+  return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${title}"><text x="${p}" y="22" font-size="17" fill="#0b3b3c" font-weight="900">${title}</text><text x="${p}" y="41" font-size="13" fill="#667b7e">${subtitle||''}</text>${rows}</svg>`;
+}
+function saldoChartSvg(rows,actualRows){
+  const pick=r=>r.filter((_,i)=>i===0||i%12===0||i===r.length-1);
+  const a=pick(actualRows),s=pick(rows);
+  const max=Math.max(...a.map(r=>r.openingBalance),...s.map(r=>r.openingBalance),1);const nMax=Math.max(actualRows.length,1);
+  const w=760,h=300,p=52;
+  const line=(arr)=>arr.map(r=>{const x=p+((r.month-1)/Math.max(1,nMax-1))*(w-2*p);const y=h-p-(r.closingBalance/max)*(h-2*p);return `${x.toFixed(1)},${y.toFixed(1)}`}).join(' ');
+  const start=`${p},${(h-p-(rows[0].openingBalance/max)*(h-2*p)).toFixed(1)} `;
+  const labels=[1,Math.round(nMax/2),nMax].map((m,i)=>`<text x="${p+i*(w-2*p)/2-(i===2?40:0)}" y="292" font-size="17" fill="#667b7e">Mes ${m}</text>`).join('');
+  return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Evolución del saldo"><line x1="${p}" y1="${h-p}" x2="${w-p}" y2="${h-p}" stroke="#d8e6e3" stroke-width="2"/><line x1="${p}" y1="${p}" x2="${p}" y2="${h-p}" stroke="#d8e6e3" stroke-width="2"/><polyline fill="none" stroke="#b68b2f" stroke-width="4" stroke-dasharray="10 8" stroke-linecap="round" stroke-linejoin="round" points="${start}${line(a)}"/><polyline fill="none" stroke="#0f766e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" points="${start}${line(s)}"/><text x="${p}" y="22" font-size="18" fill="#0b3b3c" font-weight="900">Saldo inicial: ${cop(rows[0]?.openingBalance||0)}</text>${labels}</svg>`;
+}
+function compositionChartSvg(r){
+  const total=Math.max(1,r.grossPayment);
+  const parts=[['Interés',r.interest,'#ef4444'],['Capital',r.capital,'#10b981'],['Seguro',r.insurance,'#3b82f6']];
+  let x=22;const bars=parts.map(([label,value,color])=>{const width=Math.max(0,(value/total)*596);const out=`<rect x="${x}" y="62" width="${width}" height="42" rx="12" fill="${color}"/>${width>40?`<text x="${x+6}" y="92" font-size="18" fill="white" font-weight="900">${Math.round(value/total*100)}%</text>`:''}`;x+=width;return out}).join('');
+  const legend=parts.map(([label,value,color],i)=>`<g transform="translate(24 ${128+i*22})"><circle cx="0" cy="0" r="7" fill="${color}"/><text x="15" y="5" font-size="17" fill="#334155">${label}: ${cop(value)}</text></g>`).join('');
+  const cov=r.coverage>0?`<text x="330" y="150" font-size="16" fill="#99640c" font-weight="800">Cobertura: −${cop(r.coverage)}</text><text x="330" y="172" font-size="16" fill="#0b3b3c" font-weight="800">Pagas tú: ${cop(r.clientPayment)}</text>`:'';
+  return `<svg class="chart-svg" viewBox="0 0 640 200" role="img" aria-label="Composición de cuota"><text x="22" y="26" font-size="18" fill="#0b3b3c" font-weight="900">Primera cuota total: ${cop(r.grossPayment)}</text><rect x="22" y="62" width="596" height="42" rx="12" fill="#e5eceb"/>${bars}${legend}${cov}</svg>`;
+}
+
+/* ===== Paso 2: escenarios ===== */
+function buildList(){const six=scenarios(S.data);S.list=[...six,customScenario(six,S.custom)];}
+function cardHtml(s){
+ const neg=s.ahorro<0;
+ return `<button type="button" class="scenario-card ${s.opcion===S.sel?'selected':''}" data-op="${s.opcion}"><div class="sc-head"><div class="sc-title"><span>Opción ${s.opcion} · ${s.nombre}</span><b>${s.grupo}</b></div><strong>${s.meses} meses menos</strong><em class="${neg?'neg':''}">${cop(s.ahorro)} ${neg?'sin ahorro':'ahorro'}</em></div><div class="sc-body"><div class="sc-row"><span>Vr. deuda banco</span><b>${cop(s.deuda)}</b></div><div class="sc-row"><span>Nº cuotas actual</span><b>${s.plazoActual}</b></div><div class="sc-row"><span>Vr. cuota actual</span><b>${cop(s.cuotaActual)}</b></div><div class="sc-row highlight"><span>Nº cuotas propuesta</span><b>${s.nuevoPlazo}</b></div><div class="sc-row highlight"><span>Vr. cuota propuesta</span><b>${cop(s.cuota)}</b></div><div class="sc-row"><span>Diferencia cuota</span><b>${cop(s.diferencia)}</b></div><div class="sc-row"><span>Total por pagar banco</span><b>${cop(s.totalActual)}</b></div><div class="sc-row"><span>Total por pagar propuesta</span><b>${cop(s.total)}</b></div><div class="sc-row"><span>Cuotas reducidas</span><b>${s.meses}</b></div><div class="sc-row highlight"><span>Vr. ahorrado</span><b>${cop(s.ahorro)}</b></div><div class="sc-row"><span>Seguros incluidos</span><b>${cop(s.seguro)}</b></div><div class="sc-row"><span>Ing. requeridos (30%)</span><b>${cop(s.ingresoRequerido)}</b></div></div></button>`;
+}
+function selected(){return S.list.find(x=>x.opcion===S.sel)||S.list[0]}
+function renderEsc(){
+ buildList();const d=S.data,s0=S.list[0],sel=selected();
+ $('esc-context').innerHTML=`<div class="box"><small>Crédito</small><strong>${d.tipo==='CREDITO_COBERTURA'?'Pesos con cobertura':'Pesos · cuota fija'}</strong><span>${esc(d.banco||'Banco no indicado')}</span></div><div class="box"><small>Vr. deuda actual</small><strong>${cop(s0.deuda)}</strong><span>Cuotas banco: ${s0.plazoActual}</span></div><div class="box"><small>Tasa E.A.</small><strong>${pct(s0.tasaEA*100)}</strong><span>Seguro incluido: ${cop(s0.seguro)}</span></div><div class="box"><small>Vigencia cotización</small><strong>${CONFIG.vigenciaDias} días</strong><span>Cálculo estimado</span></div>`;
+ const c=S.list[6];
+ $('esc-grid').innerHTML=S.list.map(cardHtml).join('')+`<div class="custom-box"><div><h3>Opción 7 · personalizada</h3><p>Elige tu número de cuotas o la cuota que puedes pagar. Si dejas la cuota vacía se calcula sola.</p></div><label>Nº cuotas propuesta<input id="c-term" inputmode="numeric" value="${c.nuevoPlazo}"></label><label>Cuota propuesta (opcional)<input id="c-pay" inputmode="decimal" value="${S.custom.payment>0?cop(S.custom.payment):''}" placeholder="${cop(c.cuota)}"></label></div>`;
+ $('esc-selected').innerHTML=`<article><small>Opción seleccionada</small><strong>${sel.opcion} · ${sel.nombre}</strong></article><article><small>Ahorro total</small><strong>${cop(sel.ahorro)}</strong></article><article><small>Ingreso requerido</small><strong>${cop(sel.ingresoRequerido)}</strong></article>`;
+ renderVisuals(sel);
+ $('btn-to-cot').disabled=!(sel.ahorro>0);
+ notifyHeight();
+}
+function renderVisuals(sel){
+ const base=baseConfig(S.data),cur=simulate(base),ps=simulate(sel._cfg),rows=ps.rows;
+ const pctAh=sel.totalActual>0?sel.ahorro/sel.totalActual*100:0;
+ const totInt=rows.reduce((a,r)=>a+r.interest,0),totSeg=rows.reduce((a,r)=>a+r.insurance,0),totCap=rows.reduce((a,r)=>a+r.capital,0),totCov=rows.reduce((a,r)=>a+r.coverage,0);
+ const hasCov=totCov>0;
+ $('esc-visuals').innerHTML=`<section class="scenario-visuals"><article class="chart-box"><h3>📌 Crédito actual / datos base</h3>${genericBarChartSvg('Datos iniciales del crédito',`Cuota actual ${cop(sel.cuotaActual)} · Plazo restante ${sel.plazoActual} meses`,[{label:'Saldo actual banco',value:sel.deuda,fill:'#2563eb'},{label:'Total futuro con banco',value:sel.totalActual,fill:'#b68b2f'},{label:'Intereses que faltan por pagar',value:cur.totalInterest,fill:'#ef4444'}])}<div class="chart-legend"><span><i class="legend-dot dot-saldo"></i>Datos iniciales y deuda actual</span></div></article><article class="chart-box"><h3>💰 Impacto del ahorro para el cliente</h3>${genericBarChartSvg(`Impacto de ahorro · Opción ${sel.opcion}`,`Ahorro estimado ${pct(pctAh,2)} frente al total futuro del banco`,[{label:'Total banco sin gestión',value:sel.totalActual,fill:'#b68b2f'},{label:'Total con opción seleccionada',value:sel.total,fill:'#0f766e'},{label:'Ahorro proyectado',value:Math.max(0,sel.ahorro),fill:'#10b981'}])}<div class="chart-legend"><span><i class="legend-dot dot-gold"></i>Total banco</span><span><i class="legend-dot dot-saldo"></i>Total propuesta</span><span><i class="legend-dot dot-capital"></i>Ahorro</span></div></article></section>
+ <section class="scenario-visuals"><article class="chart-box"><h3>📉 Evolución del saldo</h3>${saldoChartSvg(rows,cur.rows)}<div class="chart-legend"><span><i class="legend-dot dot-saldo"></i>Saldo con opción ${sel.opcion}</span><span><i class="legend-dot dot-gold"></i>Saldo actual con el banco</span></div></article><article class="chart-box"><h3>🧩 Composición de la cuota</h3>${compositionChartSvg(rows[0])}<div class="chart-legend"><span><i class="legend-dot dot-interes"></i>Interés</span><span><i class="legend-dot dot-capital"></i>Capital</span><span><i class="legend-dot dot-seguro"></i>Seguro</span></div></article></section>
+ <section class="amort-panel"><div class="amort-head"><div><h2>Tabla de amortización · Opción ${sel.opcion}</h2><p class="muted-note">Cuota total, abono a capital, capital pagado, interés y saldo${hasCov?', con la cobertura del gobierno y lo que pagas tú':''}.</p></div><div class="amort-actions"><button type="button" class="amort-toggle ${S.full?'':'active'}" data-full="0">Primeros 12 meses</button><button type="button" class="amort-toggle ${S.full?'active':''}" data-full="1">Ver completa</button></div></div><div class="amort-summary"><article><small>Plazo tabla</small><strong>${rows.length} meses</strong></article><article><small>Total capital</small><strong>${cop(totCap)}</strong></article><article><small>Total intereses</small><strong>${cop(totInt)}</strong></article><article><small>Total seguros</small><strong>${cop(totSeg)}</strong></article></div><div class="amort-table-wrap"><table class="amort-table"><thead><tr><th>Mes</th><th>Cuota crédito</th><th>Seguro</th><th>Cuota total</th>${hasCov?'<th>Cobertura</th><th>Pagas tú</th>':''}<th>Abono a capital</th><th>Capital pagado</th><th>Interés</th><th>Saldo</th></tr></thead><tbody>${amortRows(rows,hasCov)}</tbody></table></div><p class="amort-note">${S.full?`Mostrando tabla completa: ${rows.length} meses.`:`Mostrando los primeros 12 meses de ${rows.length}. La tabla se recalcula al seleccionar otra opción.`}</p></section>`;
+}
+function amortRows(rows,hasCov){let acc=0;const out=[];const lim=S.full?rows.length:Math.min(12,rows.length);for(let i=0;i<rows.length;i++){const r=rows[i];acc+=r.capital;if(i>=lim)break;out.push(`<tr><td>${r.month}</td><td>${cop(r.grossPayment-r.insurance)}</td><td class="money-blue">${cop(r.insurance)}</td><td class="money-gold">${cop(r.grossPayment)}</td>${hasCov?`<td class="money-green">${cop(r.coverage)}</td><td class="money-gold">${cop(r.clientPayment)}</td>`:''}<td class="money-green">${cop(r.capital)}</td><td class="money-purple">${cop(acc)}</td><td class="money-red">${cop(r.interest)}</td><td class="money-saldo">${cop(r.closingBalance)}</td></tr>`)}return out.join('')}
+
+/* ===== Paso 3: cotización ===== */
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function fmtDate(d){return d.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'})}
+function renderCot(){
+ const s=selected(),d=S.data,today=new Date(),exp=addDays(today,CONFIG.vigenciaDias);
+ const fee=Math.max(0,s.ahorro)*CONFIG.porcentajeHonorarios/100;
+ const a1=Math.round(fee/3*100)/100,a3=Math.round((fee-a1*2)*100)/100;
+ const payRows=S.pay==='TRES_ABONOS'
+  ?`<tr><td>Forma de pago</td><td>3 abonos programados</td></tr><tr><td>Honorarios totales</td><td>${cop(fee)}</td></tr>`+[a1,a1,a3].map((v,i)=>`<tr><td>Abono ${i+1}</td><td>${cop(v)} · hasta ${fmtDate(addDays(today,CONFIG.abonosDias[i]))}</td></tr>`).join('')
+  :`<tr><td>Forma de pago</td><td>Contado / pago único</td></tr><tr><td>Valor a pagar</td><td>${cop(fee)}</td></tr>`;
+ $('pay-mode').classList.toggle('hidden',!CONFIG.mostrarHonorarios);
+ $('cot-doc').innerHTML=`<article class="quote-doc"><div class="q-top"></div><header class="q-head"><div><div class="brandline"><div class="mark">52</div><div><div class="brand-title" style="color:var(--teal900)">BROKER52 <span style="color:var(--gold)">PRO</span></div><div class="brand-sub" style="color:var(--muted)">Asesoría hipotecaria inteligente</div></div></div><h1>Cotización de estudio y optimización hipotecaria</h1><p>Propuesta preliminar generada con el diagnóstico y el escenario de ahorro que elegiste. Requiere validación con tu extracto y tu banco.</p></div><aside class="q-meta"><div><small>Estado</small><strong>Simulación</strong></div><div><small>Sistema</small><strong>Pesos · francés</strong></div><div><small>Fecha</small><strong>${fmtDate(today)}</strong></div><div><small>Vigencia</small><strong>${CONFIG.vigenciaDias} días</strong></div><div><small>Válida hasta</small><strong>${fmtDate(exp)}</strong></div><div><small>Banco</small><strong>${esc(d.banco||'—')}</strong></div></aside></header><div class="q-body"><section class="q-summary"><div class="q-card green"><small>Ahorro total estimado</small><strong>${cop(s.ahorro)}</strong><span>${CONFIG.mostrarHonorarios?'Base para calcular honorarios':'Frente al total futuro del banco'}</span></div><div class="q-card"><small>Nuevo plazo</small><strong>${s.nuevoPlazo} meses</strong><span>${s.meses} meses reducidos</span></div><div class="q-card"><small>Nueva cuota total</small><strong>${cop(s.cuota)}</strong><span>Diferencia ${cop(s.diferencia)}</span></div>${CONFIG.mostrarHonorarios?`<div class="q-card gold"><small>Honorarios (${pct(CONFIG.porcentajeHonorarios)})</small><strong>${cop(fee)}</strong><span>Sobre el ahorro estimado</span></div>`:`<div class="q-card"><small>Ingreso requerido</small><strong>${cop(s.ingresoRequerido)}</strong><span>Cuota ≤ 30% del ingreso</span></div>`}</section><table class="q-table"><tr><td>Opción elegida</td><td>Opción ${s.opcion} · ${s.nombre} (grupo ${s.grupo})</td></tr><tr><td>Saldo actual</td><td>${cop(s.deuda)}</td></tr><tr><td>Tasa E.A.</td><td>${pct(s.tasaEA*100)}</td></tr><tr><td>Cuota actual / cuotas restantes</td><td>${cop(s.cuotaActual)} · ${s.plazoActual}</td></tr><tr><td>Total por pagar al banco hoy</td><td>${cop(s.totalActual)}</td></tr><tr><td>Total por pagar con la opción</td><td>${cop(s.total)}</td></tr><tr><td>Ingreso requerido (30%)</td><td>${cop(s.ingresoRequerido)}</td></tr>${CONFIG.mostrarHonorarios?payRows:''}</table></div></article>`;
+ notifyHeight();
+}
+
+/* ===== Navegación ===== */
+function show(step){
+ ['pre','esc','cot'].forEach(k=>{$('step-'+k).classList.toggle('hidden',k!==step);document.querySelector(`[data-step="${k}"]`).classList.toggle('active',k===step)});
+ if(step==='esc')renderEsc();if(step==='cot'){renderCot();document.querySelector('[data-step="cot"]').disabled=false}
+ try{window.scrollTo({top:0,behavior:'smooth'})}catch(_){window.scrollTo(0,0)}
+ try{if(window.parent!==window)window.parent.postMessage({type:'broker52-sim-top'},'*')}catch(_){}
+ notifyHeight();
+}
+document.querySelectorAll('.steps button').forEach(b=>b.addEventListener('click',()=>{if(!b.disabled)show(b.dataset.step)}));
+$('btn-calc').addEventListener('click',calcPre);
+$('btn-ejemplo').addEventListener('click',()=>{loadExample();calcPre()});
+$('btn-to-esc').addEventListener('click',()=>show('esc'));
+$('btn-to-cot').addEventListener('click',()=>show('cot'));
+$('btn-back-esc').addEventListener('click',()=>show('esc'));
+$('btn-print').addEventListener('click',()=>window.print());
+$('btn-contacto').href=CONFIG.contactoUrl;
+$('f-tipo').addEventListener('change',syncTipo);
+document.querySelectorAll('input.money').forEach(el=>el.addEventListener('blur',()=>{const n=parseMoney(el.value);el.value=n>0?cop(n):''}));
+$('esc-grid').addEventListener('click',e=>{const c=e.target.closest('.scenario-card');if(!c)return;S.sel=Number(c.dataset.op);renderEsc()});
+$('esc-grid').addEventListener('change',e=>{
+ if(e.target.id==='c-term'){S.custom.term=Math.round(parseNum(e.target.value))||0;S.custom.payment=0;S.sel=7;renderEsc()}
+ if(e.target.id==='c-pay'){S.custom.payment=Math.max(0,parseMoney(e.target.value));S.sel=7;renderEsc()}
+});
+$('esc-visuals').addEventListener('click',e=>{const b=e.target.closest('[data-full]');if(!b)return;S.full=b.dataset.full==='1';renderVisuals(selected());notifyHeight()});
+$('pay-mode').addEventListener('click',e=>{const b=e.target.closest('[data-pay]');if(!b)return;S.pay=b.dataset.pay;document.querySelectorAll('#pay-mode [data-pay]').forEach(x=>x.classList.toggle('active',x===b));renderCot()});
+
+/* Altura automática cuando se usa dentro de un iframe */
+let lastH=0;function notifyHeight(){try{if(window.parent===window)return;const h=Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height);if(Math.abs(h-lastH)<2)return;lastH=h;window.parent.postMessage({type:'broker52-sim-height',height:h},'*')}catch(_){}}
+window.addEventListener('load',notifyHeight);window.addEventListener('resize',notifyHeight);
+
+loadExample();
+window.BROKER52_SIM={scenarios,simulate,baseConfig,customScenario};
+})();
+</script>
+</body>
+</html>

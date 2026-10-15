@@ -253,6 +253,11 @@
         letter-spacing: -1.5px;
       }
     }
+
+    /* Simulador BROKER52 embebido */
+    .simulador { background: #f6fafb; padding: 85px 0; }
+    .simulador .section-title { padding: 0 24px; }
+    .simulador iframe { display: block; width: 100%; max-width: 1180px; margin: 0 auto; height: 1400px; border: 0; }
   </style>
 </head>
 
@@ -265,6 +270,7 @@
     <nav>
       <a href="#servicios">Qué hacemos</a>
       <a href="#proceso">Cómo funciona</a>
+      <a href="#simulador">Simulador</a>
       <a href="#contacto">Contacto</a>
     </nav>
   </div>
@@ -417,6 +423,27 @@
 
   </section>
 
+
+  <section class="simulador" id="simulador">
+    <div class="container">
+      <div class="section-title">
+        <p class="eyebrow">Simulador</p>
+        <h2>¿Cuánto podrías ahorrar en tu crédito?</h2>
+        <p>Ingresa los datos de tu extracto y mira escenarios de reducción de plazo con el mismo motor de cálculo que usan nuestros asesores. Es una estimación: no guardamos ni enviamos tus datos.</p>
+      </div>
+    </div>
+    <iframe id="broker52-simulador" src="simulador.html" title="Simulador BROKER52" loading="lazy"></iframe>
+    <script>
+      window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'broker52-sim-height') {
+          document.getElementById('broker52-simulador').style.height = e.data.height + 'px';
+        }
+        if (e.data && e.data.type === 'broker52-sim-top') {
+          document.getElementById('broker52-simulador').scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    </script>
+  </section>
 
   <section class="contact" id="contacto">
 
